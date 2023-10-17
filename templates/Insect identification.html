@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>昆虫图像识别系统</title>
+  <style>
+    body {
+      text-align: center;
+      background-image: url('/static/Image.jpg');
+      background-size: cover;
+      font-family: Arial, sans-serif;
+    }
+
+    h1 {
+      margin-top: 50px;
+      color: #333333;
+      font-size: 36px;
+      font-weight: bold;
+      text-shadow: 2px 2px #cccccc;
+    }
+
+    form {
+      margin-top: 50px;
+    }
+
+    input {
+      padding: 10px;
+      margin: 10px;
+      border: 1px solid #cccccc;
+      border-radius: 5px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #428bca;
+      color: #ffffff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #3071a9;
+    }
+
+    #result {
+      margin-top: 50px;
+    }
+
+    img {
+      margin-top: 20px;
+      max-width: 500px;
+      border: 1px solid #cccccc;
+      border-radius: 5px;
+    }
+
+    p {
+      margin-top: 20px;
+      color: #666666;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    #insect-name, #algorithm-result, #insect-introduction {
+      color: ghostwhite;
+      font-size: 24px;
+    }
+  </style>
+</head>
+<body>
+<h1>昆虫图像识别系统</h1>
+<form>
+  <input type="text" id="image-url" placeholder="输入图像链接">
+  <input type="file" id="image-upload" accept="image/*">
+  <button type="button" onclick="processImage()">图像识别</button>
+</form>
+
+<div id="result">
+  <img id="image-preview" src="" alt="预览图像">
+  <p id="insect-name"></p>
+  <p id="algorithm-result"></p>
+  <p id="insect-introduction"></p>
+</div>
+
+<script>
+function processImage() {
+  var imageUrl = document.getElementById("image-url").value;
+  var file = document.getElementById("image-upload").files[0];
+
+  var formData = new FormData();
+  formData.append("image", file);
+
+  // 如果输入了图像链接，则使用该链接进行识别
+  if (imageUrl) {
+    formData.append("imageUrl", imageUrl);
+  }
+
+  fetch("/process_image", {
+    method: "POST",
+    body: formData
+  })
+    .then(response => response.json())
+    .then(data => {
+      // 显示图像和识别结果
+      document.getElementById("image-preview").src = imageUrl || URL.createObjectURL(file);
+      document.getElementById("insect-name").textContent = "昆虫名称：" + data.insectName;
+      document.getElementById("algorithm-result").textContent = "算法识别结果：" + data.algorithmResult;
+      document.getElementById("insect-introduction").textContent = "昆虫介绍：" + data.insectIntroduction;
+    })
+    .catch(error => console.log(error));
+}
+</script>
+</body>
+</html>
